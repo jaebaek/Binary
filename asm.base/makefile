@@ -11,36 +11,37 @@
 #
 # $< in <command> is the dependencies
 
-GAS:=as
-NASM:=nasm
-LD:=ld
+gas:=as
+nasm:=nasm
+ld:=ld
 
-NASM_SRC:=$(wildcard *.asm)
-GAS_SRC:=$(wildcard *.s)
+nasm_src:=$(wildcard *.asm)
+gas_src:=$(wildcard *.s)
 
-NASM_OBJ:=$(patsubst %.asm, %.nasm.o, $(NASM_SRC))
-GAS_OBJ:=$(patsubst %.s, %.gas.o, $(GAS_SRC))
-OBJ:=$(NASM_OBJ) $(GAS_OBJ)
+nasm_obj:=$(patsubst %.asm, %.nasm.o, $(nasm_src))
+gas_obj:=$(patsubst %.s, %.gas.o, $(gas_src))
+obj:=$(nasm_obj) $(gas_obj)
 
-NASM_BIN:=$(patsubst %.asm, %.nasm, $(NASM_SRC))
-GAS_BIN:=$(patsubst %.s, %.gas, $(GAS_SRC))
-BIN:=$(NASM_BIN) $(GAS_BIN)
+nasm_bin:=$(patsubst %.asm, %.nasm, $(nasm_src))
+gas_bin:=$(patsubst %.s, %.gas, $(gas_src))
+bin:=$(nasm_bin) $(gas_bin)
 
 # targets listed after .PHONY are non-file targets
 .PHONY: all clean
 
-all: $(BIN)
+all: $(bin)
 
-$(BIN): $(OBJ)
-	$(LD) -m elf_i386 -s -o $@ $<
+%.nasm: %.nasm.o
+	$(ld) -m elf_i386 -s -o $@ $<
 
-# for NASM
-$(NASM_OBJ): $(NASM_SRC)
-	$(NASM) -f elf -o $@ $<
+%.gas: %.gas.o
+	$(ld) -m elf_i386 -s -o $@ $<
 
-# for GAS
-$(GAS_OBJ): $(GAS_SRC)
-	$(AS) --32 -o $@ $<
+%.nasm.o: %.asm
+	$(nasm) -f elf -o $@ $<
+
+%.gas.o: %.s
+	$(as) --32 -o $@ $<
 
 clean:
-	-rm $(OBJ) $(BIN)
+	-rm $(obj) $(bin)
