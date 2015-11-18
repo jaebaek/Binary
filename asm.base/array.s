@@ -13,8 +13,8 @@ n:
 	.long 3
 
 	.text
-	.global main
-main:
+	.global _start
+_start:
 	push $n
 	push $inMsg
 	call scanf
